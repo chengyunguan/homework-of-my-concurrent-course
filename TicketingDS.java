@@ -16,12 +16,12 @@ public class TicketingDS implements TicketingSystem {
 	int stationnum = 10;
 	Random random = new Random();
 	//
-	AtomicLong[] ticket_record;//Éú³ÉtidºÅ
+	AtomicLong[] ticket_record;//ç”Ÿæˆtidå·
 	//
 	Train_Info train_Info;
 	Seat_Info seat_Info;
 	/***********************************************************************
-	 * TicketingDS¹¹Ôìº¯Êı
+	 * TicketingDSæ„é€ å‡½æ•°
 	 * @param routenum
 	 * @param coachnum
 	 * @param seatnum
@@ -32,7 +32,7 @@ public class TicketingDS implements TicketingSystem {
 		this.coachnum = coachnum;
 		this.seatnum = seatnum;
 		this.stationnum = stationnum;
-		this.ticket_record = new AtomicLong[routenum+1];//Éú³ÉtidºÅ
+		this.ticket_record = new AtomicLong[routenum+1];//ç”Ÿæˆtidå·
 		for(int i = 1;i<=routenum;i++){
 			ticket_record[i]=new AtomicLong(i*1000000);
 		}
@@ -40,7 +40,7 @@ public class TicketingDS implements TicketingSystem {
 		seat_Info = new Seat_Info(routenum,stationnum, coachnum, seatnum);
 	}
 	/**************************************
-	 * ÎŞ²ÎÊı¹¹Ôìº¯Êı
+	 * æ— å‚æ•°æ„é€ å‡½æ•°
 	 */
 	public TicketingDS() {
 		this.ticket_record =new AtomicLong[routenum+1];
@@ -51,7 +51,7 @@ public class TicketingDS implements TicketingSystem {
 		seat_Info = new Seat_Info(routenum,stationnum, coachnum, seatnum);
 	}
 	/***********************************
-	¹ºÆ±³ÌĞò
+	è´­ç¥¨ç¨‹åº
 	***********************************/
 	@Override
 	public Ticket buyTicket(String passenger, int route, int departure, int arrival) {
@@ -62,7 +62,7 @@ public class TicketingDS implements TicketingSystem {
 				round_back_i = i;
 				break;
 			}
-		if(round_back_i != 0){//ÊÊÓÃÓÚÓàÆ±²»×ãÊ±µÄÇé¿ö£¬´ËÊ±¿ÉÒÔÔÚ¶ÔÓ¦Çø¶ÎÓàÆ±Îª0Ê±´ó´ó¼õÉÙÎŞĞ§²éÑ¯µÄÇé¿ö
+		if(round_back_i != 0){//é€‚ç”¨äºä½™ç¥¨ä¸è¶³æ—¶çš„æƒ…å†µï¼Œæ­¤æ—¶å¯ä»¥åœ¨å¯¹åº”åŒºæ®µä½™ç¥¨ä¸º0æ—¶å¤§å¤§å‡å°‘æ— æ•ˆæŸ¥è¯¢çš„æƒ…å†µ
 			for(int i = departure;i<=round_back_i;i++)
 				train_Info.train_info[route][i].getAndIncrement();
 		}
@@ -77,24 +77,19 @@ public class TicketingDS implements TicketingSystem {
 				z = i-coachnum;
 			else
 				z = i;
-			for(int j = 1;j<=seatnum;j++){//ÕÒ×ùÎ»,ÔİÊ±Éè¶¨Îª´ÓÍ·¿ªÊ¼Ñ°ÕÒ	
-				try{
+			for(int j = 1;j<=seatnum;j++){//æ‰¾åº§ä½,æš‚æ—¶è®¾å®šä¸ºä»å¤´å¼€å§‹å¯»æ‰¾	
 				if(seat_Info.Seat_Nodes[route][z][j].Station[departure] || seat_Info.Seat_Nodes[route][z][j].Station[arrival-1]){
 					continue;
 				}
-				}catch (ArrayIndexOutOfBoundsException e) {
-					// TODO: handle exception
-					System.out.println("hehe");
-				}
 				try {
-					seat_Info.Seat_Nodes[route][z][j].lock.tryLock(2,TimeUnit.SECONDS);//²ÉÓÃTryLcok»úÖÆ±£Ö¤²»»áËÀËø£¬2ÃëµÈ´ı
+					seat_Info.Seat_Nodes[route][z][j].lock.tryLock(2,TimeUnit.SECONDS);//é‡‡ç”¨TryLcokæœºåˆ¶ä¿è¯ä¸ä¼šæ­»é”ï¼Œ2ç§’ç­‰å¾…
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				for(int k = departure;k<arrival;k++){//¸´¼ì
+				for(int k = departure;k<arrival;k++){//å¤æ£€
 					if(seat_Info.Seat_Nodes[route][z][j].Station[k]){
-						flag = true;//¸´¼ìÊ§°Ü
+						flag = true;//å¤æ£€å¤±è´¥
 						break;
 					}
 				}
@@ -105,7 +100,7 @@ public class TicketingDS implements TicketingSystem {
 				}
 				Ticket newTicket = new Ticket();
 				//newTicket.tid = System.nanoTime();//
-				newTicket.tid =ticket_record[route].getAndIncrement();//ÏÈÈ¡µÃÒ»¸ötidºÅ
+				newTicket.tid =ticket_record[route].getAndIncrement();//å…ˆå–å¾—ä¸€ä¸ªtidå·
 				newTicket.passenger = passenger;
 				newTicket.route = route;
 				newTicket.departure = departure;
@@ -128,7 +123,7 @@ public class TicketingDS implements TicketingSystem {
 		
 	}
 	/*************************************
-	 *²éÆ±³ÌĞò 
+	 *æŸ¥ç¥¨ç¨‹åº 
 	 ************************************/
 	@Override
 	public int inquiry(int route, int departure, int arrival) {
@@ -142,7 +137,7 @@ public class TicketingDS implements TicketingSystem {
 		return sum;
 	}
 	/***************************************
-	 * ÍËÆ±³ÌĞò
+	 * é€€ç¥¨ç¨‹åº
 	 **************************************/
 	@Override
 	public boolean refundTicket(Ticket ticket) {
@@ -164,7 +159,7 @@ public class TicketingDS implements TicketingSystem {
 	}
 }
 		
-class Train_Info{//×Ü±í,ÓÃÓÚ¼ÇÂ¼×ÜµÄ³µÆ±Çé¿ö
+class Train_Info{//æ€»è¡¨,ç”¨äºè®°å½•æ€»çš„è½¦ç¥¨æƒ…å†µ
 	Lock[] train_info_lock;
 	AtomicInteger[][] train_info;
 	public Train_Info(int routenum,int coachnum,int seatnum,int stationnum) {
@@ -179,9 +174,9 @@ class Train_Info{//×Ü±í,ÓÃÓÚ¼ÇÂ¼×ÜµÄ³µÆ±Çé¿ö
 	}
 }
 
-class Seat_Node{//Ã¿¸ö×ùÎ»¶¼ÊÇÒ»¸ö½Úµã£¬ÕâÊÇ×ùÎ»µÄ½Úµã¹¹
+class Seat_Node{//æ¯ä¸ªåº§ä½éƒ½æ˜¯ä¸€ä¸ªèŠ‚ç‚¹ï¼Œè¿™æ˜¯åº§ä½çš„èŠ‚ç‚¹æ„
 	Lock lock;
-	boolean[] Station;//Ã¿¸ö×ùÎ»¶¼»á¼ÇÂ¼Õ¾µãĞÅÏ¢
+	boolean[] Station;//æ¯ä¸ªåº§ä½éƒ½ä¼šè®°å½•ç«™ç‚¹ä¿¡æ¯
 	long[] tid;
 	String[] passenger;
 	public Seat_Node(int stationnum) {
@@ -191,7 +186,7 @@ class Seat_Node{//Ã¿¸ö×ùÎ»¶¼ÊÇÒ»¸ö½Úµã£¬ÕâÊÇ×ùÎ»µÄ½Úµã¹¹
 		passenger = new String[stationnum+1];
 		for(int i = 1;i<=stationnum;i++){
 			tid[i] = 0;
-			Station[i] = false;//false±íÊ¾¶ÔÓ¦Çø¶Î»¹Ã»ÓĞ±»¹ºÂò
+			Station[i] = false;//falseè¡¨ç¤ºå¯¹åº”åŒºæ®µè¿˜æ²¡æœ‰è¢«è´­ä¹°
 			passenger[i] = "";
 		}
 		lock = new ReentrantLock();
@@ -200,7 +195,7 @@ class Seat_Node{//Ã¿¸ö×ùÎ»¶¼ÊÇÒ»¸ö½Úµã£¬ÕâÊÇ×ùÎ»µÄ½Úµã¹¹
 
 
 
-class Seat_Info{//×ùÎ»±í,±£´æ×ÜµÄnÌË³µm¸ö³µÏák¸ö×ùÎ»µÄĞÅÏ¢
+class Seat_Info{//åº§ä½è¡¨,ä¿å­˜æ€»çš„nè¶Ÿè½¦mä¸ªè½¦å¢kä¸ªåº§ä½çš„ä¿¡æ¯
 	Seat_Node[][][] Seat_Nodes;
 	public Seat_Info(int routenum,int stationnum,int coachnum,int seatnum) {
 		// TODO Auto-generated constructor stub
